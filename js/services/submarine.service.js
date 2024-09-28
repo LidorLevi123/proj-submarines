@@ -8,7 +8,6 @@ const DESTROYED = 3
 
 var gPlayers
 var gCurrPlayerIdx
-var gMaxHits
 
 function createPlayers() {
     gPlayers = [
@@ -30,14 +29,25 @@ function createHitBoard() {
     // board[0][0] = DESTROYED
     // board[0][1] = DESTROYED
     // board[0][2] = DESTROYED
+    // board[5][1] = HIT
+    // board[6][1] = HIT
+    // board[7][1] = HIT
+    // board[0][6] = MISS
+    // board[7][8] = MISS
+    // board[8][7] = MISS
+    // board[9][5] = MISS
+    // board[5][7] = MISS
+    // board[4][3] = MISS
+    // board[4][2] = MISS
+    // board[4][0] = MISS
     // DEBUG
     return board
 }
 
 function createBoard() {
     const board = createHitBoard()
-    setShips(board)
-    // autoPlaceShips(board)
+    // setShips(board)
+    autoPlaceShips(board)
     return board
 }
 

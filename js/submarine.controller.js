@@ -1,9 +1,15 @@
 'use strict'
 
+const gGameStates = getGameStates()
 const gAudioHit = new Audio('./sound/hit.mp3')
 const gAudioMiss = new Audio('./sound/miss.mp3')
 const gAudioDestroy = new Audio('./sound/destroy.mp3')
 const gAudioAmbience = new Audio('./sound/ambience.mp3')
+
+var gIsSoundMuted = false
+var gIsAmbienceMuted = false
+var gTurnIntervalId
+var gGifTimeoutId
 
 gAudioHit.volume = 0.1
 gAudioMiss.volume = 0.1
@@ -11,16 +17,10 @@ gAudioDestroy.volume = 0.1
 gAudioAmbience.volume = 0.050
 gAudioAmbience.loop = true
 
-var isSoundMuted = false
-var isAmbienceMuted = false
-var gTurnIntervalId
-
-const gGameStates = getGameStates()
-
 function onInit() {
     createPlayers()
     renderBoard()
-    gAudioAmbience.play()
+    // gAudioAmbience.play()
 }
 
 function renderBoard() {
@@ -38,10 +38,7 @@ function renderBoard() {
 
             if (cell === gGameStates.HIT) className += ' hit'
             else if (cell === gGameStates.DESTROYED) className += ' hit destroyed'
-            else if (cell === gGameStates.MISS) {
-                className += ' miss'
-                content += 'X'
-            }
+            else if (cell === gGameStates.MISS) className += ' miss'
 
             strHTML += `<td id="cell-${i}-${j}" class="${className}" onclick="onCellClicked(this)">${content}</td>`
         }
@@ -76,12 +73,11 @@ function onCellClicked(elCell) {
     } else {
         setCellState(coord, gGameStates.MISS)
         elCell.classList.add('miss')
-        elCell.innerText = 'X'
-        elBoard.classList.add('unclickable')
-
+        
         gAudioMiss.currentTime = 0
         gAudioMiss.play()
-
+        
+        elBoard.classList.add('unclickable')
         gTurnIntervalId = setTimeout(() => {
             elBoard.classList.remove('unclickable')
             setNextTurn()
@@ -100,10 +96,16 @@ function isEmptyCell(coord) {
     return currPlayer.hitBoard[coord.i][coord.j] === gGameStates.EMPTY
 }
 
-function showShipImg() {
+function isDestroyed(coord) {
+    const currPlayer = getCurrPlayer()
+    return currPlayer.hitBoard[coord.i][coord.j] === gGameStates.DESTROYED
+}
+
+function showShipGIF() {
+    clearTimeout(gGifTimeoutId)
     const elRadar = document.querySelector('.radar')
     elRadar.src = `img/ship${getRandomInt(1, 5)}.gif`
-    setTimeout(()=> {
+    gGifTimeoutId = setTimeout(()=> {
         elRadar.src = 'img/radar.gif'
     }, 7000)
 }
@@ -119,14 +121,9 @@ function markDestroyedCells(coord) {
         castFlames(elCell)
     }
     
-    showShipImg()
+    showShipGIF()
     gAudioDestroy.currentTime = 0
     gAudioDestroy.play()
-}
-
-function isDestroyed(coord) {
-    const currPlayer = getCurrPlayer()
-    return currPlayer.hitBoard[coord.i][coord.j] === gGameStates.DESTROYED
 }
 
 function castFlames(elCell) {
@@ -163,13 +160,13 @@ function getCellCoord(elCell) {
 }
 
 function onMuteBG() {
-    isAmbienceMuted = !isAmbienceMuted
-    isAmbienceMuted ? gAudioAmbience.pause() : gAudioAmbience.play()
+    gIsAmbienceMuted = !gIsAmbienceMuted
+    gIsAmbienceMuted ? gAudioAmbience.pause() : gAudioAmbience.play()
 }
 
 function onMuteSE() {
-    isSoundMuted = !isSoundMuted
-    if (isSoundMuted) {
+    gIsSoundMuted = !gIsSoundMuted
+    if (gIsSoundMuted) {
         gAudioHit.volume = 0
         gAudioMiss.volume = 0
         gAudioDestroy.volume = 0

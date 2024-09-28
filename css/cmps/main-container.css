@@ -5,25 +5,19 @@
 
     max-height: 95vh;
     gap: 5px;
-    padding-top: 2vh;
+    align-self: center;
 }
 
 .main-container .current-player {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     background-color: rgb(75, 82, 79);
     text-align: center;
 }
 
 .main-container .current-player h1 {
     color: rgb(0, 0, 0);
-    font-size: 2rem;
-}
-
-.main-container .game-container {
-    display: grid;
-    gap: 2px;
+    font-size: 3rem;
 }
 
 .main-container .radar {
@@ -35,4 +29,8 @@
 
 .main-container .actions {
     display: grid;
+}
+
+.main-container .actions button {
+    font-size: 1rem;
 }
